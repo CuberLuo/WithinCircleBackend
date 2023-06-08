@@ -2,13 +2,15 @@ import os
 
 from flask import Flask, request, jsonify
 import mysql.connector
+from flask_sqlalchemy import SQLAlchemy
+from utils.passwordUtils import encrypt,checkPassword
 
 app = Flask(__name__)
 
 # 数据库密码
 db_password = os.environ.get('DATABASE_PASSWORD')
 config = {
-    'host': 'localhost',
+    'host': '1.15.134.164',
     'user': 'root',
     'password': db_password,
     'database': 'within-circle'
@@ -27,6 +29,7 @@ def handle_register():
     print(json_data)
     username = json_data['username']
     password = json_data['password']
+    hashed_password = encrypt(password)
 
     res_data = {
         'code': 10000,
@@ -52,4 +55,4 @@ def handle_login():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=54321)
