@@ -9,7 +9,7 @@ def encrypt(password):
 
 
 def checkPassword(input_password, hashed_password):
-    if bcrypt.checkpw(input_password.encode('utf-8'), hashed_password):
+    if bcrypt.checkpw(input_password.encode('utf-8'), hashed_password.encode('utf-8')):
         return True
     else:
         return False
