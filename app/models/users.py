@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from database import db
-from utils.timeUtils import getTimeId
+from ..database import db
+from ..utils.timeUtils import getTimeId
 
 
 class Users(db.Model):

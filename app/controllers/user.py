@@ -1,26 +1,13 @@
-import os
+from flask import Blueprint, request, jsonify
 
-from flask import Flask, request, jsonify
-
-from models import Users
-from utils.passwordUtils import encrypt, checkPassword
-from status import StatusCode
-from database import db
-
-app = Flask(__name__)
-
-# 数据库密码
-db_password = os.environ.get('DATABASE_PASSWORD')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:' + db_password + '@1.15.134.164/within-circle'
-db.init_app(app)
+from app.status import StatusCode
+from app.models.users import Users
+from app.utils.passwordUtils import encrypt, checkPassword
+from ..database import db
+user_bp = Blueprint('user', __name__)
 
 
-@app.route('/')
-def hello_world():
-    return 'hello'
-
-
-@app.route('/register', methods=['POST'])
+@user_bp.route('/register', methods=['POST'])
 def handle_register():
     json_data = request.get_json()
     print(json_data)
@@ -57,7 +44,7 @@ def handle_register():
         return jsonify(res_data)
 
 
-@app.route('/login', methods=['POST'])
+@user_bp.route('/login', methods=['POST'])
 def handle_login():
     json_data = request.get_json()
     print(json_data)
@@ -87,7 +74,3 @@ def handle_login():
                 'msg': '密码错误'
             }
             return jsonify(res_data)
-
-
-if __name__ == '__main__':
-    app.run(port=54321)
