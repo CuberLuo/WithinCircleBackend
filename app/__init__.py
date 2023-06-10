@@ -1,4 +1,6 @@
 from flask import Flask
+from flask_jwt_extended import JWTManager
+
 from .database import db
 from .controllers.user import user_bp
 import logging
@@ -14,6 +16,8 @@ def create_app():
     app.register_blueprint(user_bp)
     # 数据库初始化
     db.init_app(app)
+    # JWT 初始化
+    JWTManager(app)
     # 配置日志
     handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=1)
     handler.setLevel(logging.INFO)
