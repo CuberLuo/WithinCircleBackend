@@ -34,7 +34,8 @@ def handle_register():
             'msg': '注册成功'
         }
         return jsonify(res_data)
-    except Exception:
+    except Exception as e:
+        print(e)
         res_data = {
             'code': StatusCode.REGISTER_FAIL,
             'msg': '注册失败'
