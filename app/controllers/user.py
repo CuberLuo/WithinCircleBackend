@@ -89,7 +89,7 @@ def login():
             return jsonify(res_data)
 
 
-@user_bp.route('/tokenRefresh', methods=['GET'])
+@user_bp.route('/token-refresh', methods=['GET'])
 @jwt_required(refresh=True)
 def token_refresh():
     user_id = get_jwt_identity()
@@ -172,7 +172,7 @@ def sms():
         return jsonify(res_data)
 
 
-@user_bp.route('/smsCheck', methods=['GET'])
+@user_bp.route('/sms-check', methods=['GET'])
 @jwt_required(optional=True)
 def sms_check():
     phone_num = request.args.get('phone')
@@ -233,7 +233,7 @@ def sms_check():
         return jsonify(res_data)
 
 
-@user_bp.route('/pwdChange', methods=['POST'])
+@user_bp.route('/pwd', methods=['PUT'])
 @jwt_required(optional=False)
 def pwd_change():
     original_pwd = request.get_json()['original_pwd']
@@ -256,11 +256,12 @@ def pwd_change():
         return jsonify(res_data)
 
 
-@user_bp.route('/followUser', methods=['POST'])
+@user_bp.route('/follow-user', methods=['POST'])
 @jwt_required(optional=False)
 def follow_user():
-    user_id = get_jwt_identity()
-    other_user_id = request.get_json()['user_id']
+    user_id = get_jwt_identity()  # int类型的user_id
+    other_user_id = int(request.get_json()['user_id'])  # str类型的user_id转为int类型
+
     if user_id == other_user_id:
         res_data = {
             'code': StatusCode.ERROR,
@@ -287,7 +288,7 @@ def follow_user():
         return jsonify(res_data)
 
 
-@user_bp.route('/getMyFollows', methods=['GET'])
+@user_bp.route('/my-follows', methods=['GET'])
 @jwt_required(optional=False)
 def get_my_follows():
     user_id = get_jwt_identity()
@@ -311,7 +312,7 @@ def get_my_follows():
     return jsonify(res_data)
 
 
-@user_bp.route('/getMyFans', methods=['GET'])
+@user_bp.route('/my-fans', methods=['GET'])
 @jwt_required(optional=False)
 def get_my_fans():
     user_id = get_jwt_identity()

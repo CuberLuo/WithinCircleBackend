@@ -59,7 +59,7 @@ def process_posts(all_posts, user_id):
     return posts_list
 
 
-@post_bp.route('/fileUpload', methods=['POST'])
+@post_bp.route('/file-upload', methods=['POST'])
 @jwt_required(optional=False)
 def file_upload():
     try:
@@ -80,7 +80,7 @@ def file_upload():
         return jsonify(res_data)
 
 
-@post_bp.route('/uploadPost', methods=['POST'])
+@post_bp.route('/post', methods=['POST'])
 @jwt_required(optional=False)
 def upload_post():
     user_id = get_jwt_identity()
@@ -119,7 +119,7 @@ def upload_post():
         return jsonify(res_data)
 
 
-@post_bp.route('/getAllPosts', methods=['GET'])
+@post_bp.route('/posts', methods=['GET'])
 @jwt_required(optional=False)
 def get_all_posts():
     user_id = get_jwt_identity()
@@ -135,7 +135,7 @@ def get_all_posts():
     return jsonify(res_data)
 
 
-@post_bp.route('/getPageSizePosts', methods=['GET'])
+@post_bp.route('/page-size-posts', methods=['GET'])
 @jwt_required(optional=False)
 def get_page_size_posts():
     user_id = get_jwt_identity()
@@ -151,7 +151,7 @@ def get_page_size_posts():
     return jsonify(res_data)
 
 
-@post_bp.route('/likePost', methods=['POST'])
+@post_bp.route('/like-post', methods=['PATCH'])
 @jwt_required(optional=False)
 def like_post():
     user_id = get_jwt_identity()
@@ -179,7 +179,7 @@ def like_post():
         return jsonify(res_data)
 
 
-@post_bp.route('/getMyPosts', methods=['GET'])
+@post_bp.route('/my-posts', methods=['GET'])
 @jwt_required(optional=False)
 def get_my_posts():
     user_id = get_jwt_identity()
@@ -193,7 +193,7 @@ def get_my_posts():
     return jsonify(res_data)
 
 
-@post_bp.route('/deletePost', methods=['POST'])
+@post_bp.route('/post', methods=['DELETE'])
 @jwt_required(optional=False)
 def delete_post():
     user_id = get_jwt_identity()
@@ -215,7 +215,7 @@ def delete_post():
         return jsonify(res_data)
 
 
-@post_bp.route('/getMyLikePosts', methods=['GET'])
+@post_bp.route('/my-like-posts', methods=['GET'])
 @jwt_required(optional=False)
 def get_my_like_posts():
     user_id = get_jwt_identity()

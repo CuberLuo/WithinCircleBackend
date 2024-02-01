@@ -15,7 +15,7 @@ from ..utils.file_utils import dev_file_upload
 userinfo_bp = Blueprint('userinfo', __name__)
 
 
-@userinfo_bp.route('/getUserInfo', methods=['GET'])
+@userinfo_bp.route('/user-info', methods=['GET'])
 @jwt_required(optional=False)
 def get_user_info():
     user_id = get_jwt_identity()
@@ -48,7 +48,7 @@ def get_user_info():
         return jsonify(res_data)
 
 
-@userinfo_bp.route('/uploadUserAvatar', methods=['POST'])
+@userinfo_bp.route('/avatar', methods=['PUT'])
 @jwt_required(optional=False)
 def upload_user_avatar():
     user_id = get_jwt_identity()
@@ -68,7 +68,7 @@ def upload_user_avatar():
     return jsonify(res_data)
 
 
-@userinfo_bp.route('/getPosterUserInfo/<poster_id>', methods=['GET'])
+@userinfo_bp.route('/poster_user_info/<poster_id>', methods=['GET'])
 @jwt_required(optional=False)
 def get_poster_user_info(poster_id):
     user_id = get_jwt_identity()
@@ -82,7 +82,7 @@ def get_poster_user_info(poster_id):
             'msg': '用户不存在'
         }
         return jsonify(res_data)
-    user_follows_exist = UserFollows.query.filter_by(baseUserId=user_id, followUserId=poster_id).first()
+    user_follows_exist = UserFollows.query.filter_by(base_user_id=user_id, follow_user_id=poster_id).first()
     if user_follows_exist:
         is_followed = True
     else:
