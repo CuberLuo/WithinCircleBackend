@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from ..database import db
-from ..utils.time_utils import get_time_id
+from ..utils.user_utils import generate_id_by_snowflake
 
 
 class Posts(db.Model):
@@ -16,7 +16,7 @@ class Posts(db.Model):
     like_num = db.Column(db.Integer)
 
     def __init__(self, user_id, post_msg, visible_circle, loc_name, lat, lon):
-        self.id = get_time_id()
+        self.id = generate_id_by_snowflake()
         self.post_date = datetime.now()
         self.user_id = user_id
         self.post_msg = post_msg

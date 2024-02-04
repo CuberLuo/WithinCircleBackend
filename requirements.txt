@@ -1,10 +1,13 @@
 mysql-connector-python~=8.0.33
-flask~=2.3.2
+flask~=2.2.2
 bcrypt~=3.2.0
 sqlalchemy~=1.4.32
 alibabacloud_dysmsapi20170525~=2.0.24
 flask_sqlalchemy~=3.0.3
 flask_jwt_extended~=4.5.2
 pymysql~=1.0.3
-requests~=2.27.1
+requests~=2.31.0
 geopy~=2.4.1
+
+pillow~=10.0.1
+snowflake-id~=0.0.5

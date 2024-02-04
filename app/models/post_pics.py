@@ -1,5 +1,5 @@
 from ..database import db
-from ..utils.time_utils import get_time_id
+from ..utils.user_utils import generate_id_by_snowflake
 
 
 class PostPics(db.Model):
@@ -8,6 +8,6 @@ class PostPics(db.Model):
     pic_link = db.Column(db.String(255))
 
     def __init__(self, post_id, pic_link):
-        self.id = get_time_id()
+        self.id = generate_id_by_snowflake()
         self.post_id = post_id
         self.pic_link = pic_link

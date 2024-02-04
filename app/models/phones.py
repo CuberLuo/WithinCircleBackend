@@ -1,5 +1,5 @@
 from ..database import db
-from ..utils.time_utils import get_time_id
+from ..utils.user_utils import generate_id_by_snowflake
 
 
 class Phones(db.Model):
@@ -10,5 +10,5 @@ class Phones(db.Model):
     expire_time = db.Column(db.DateTime())
 
     def __init__(self, phone):
-        self.id = get_time_id()
+        self.id = generate_id_by_snowflake()
         self.phone = phone
