@@ -11,3 +11,4 @@ geopy~=2.4.1
 
 pillow~=10.0.1
 snowflake-id~=0.0.5
+flask-socketio~=5.3.6
