@@ -32,6 +32,7 @@ def get_user_info():
         res_data = {
             'code': StatusCode.OK,
             'data': {
+                'user_id': user_id,
                 'username': username,
                 'register_date': register_date,
                 'avatar_url': avatar_url,
@@ -92,7 +93,8 @@ def get_poster_user_info(poster_id):
         'data': {
             'follow': is_followed,
             'avatar_url': avatar_url,
-            'username': poster_username
+            'username': poster_username,
+            'my_info': user_id == int(poster_id)
         },
         'msg': '获取发布者信息成功'
     }
