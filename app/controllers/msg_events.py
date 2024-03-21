@@ -11,34 +11,38 @@ def register_socketio_events(socketio):
     @socketio.on('connect')
     def handle_connect():
         socket_id = request.sid
-        print(f'socket id: {socket_id}')
-
         username = request.args.get('username')
         user_id = request.args.get('userId')
-        chat_user_id = request.args.get('chatUserId')
+        print(f'新增连接 socket id: {socket_id} username: {username} user_id: {user_id}')
 
-        print(f"User connected: {username}, User ID: {user_id}, Chat User ID: {chat_user_id}")
+    @socketio.on("privateChatHistory")
+    def handle_private_chat_history(data):
+        socket_id = request.sid
+        print(f'private_chat_history socket id: {socket_id}')
+        username = request.args.get('username')
+        user_id = request.args.get('userId')
+        print(f'用户{username}获取聊天记录')
+        chat_user_id = data['chatUserId']
+        chat_key = combine_strings(user_id, chat_user_id)
 
         user_map[user_id] = socket_id
-        user_socket_id = user_map[user_id]
-        chat_key = combine_strings(user_id, chat_user_id)
         # 聊天双方没有历史聊天记录则初始化聊天双方key对应的聊天记录列表
         if chat_key not in private_chat_history:
             private_chat_history[chat_key] = []
         emit("privateChatHistory", {
             "chatUserId": chat_user_id,
             "msgHistory": private_chat_history[chat_key]
-        }, room=user_socket_id)
+        }, room=socket_id)
 
     @socketio.on("privateChat")
-    def private_chat(data):
+    def handle_private_chat(data):
         socket_id = request.sid
         print(f'private_chat socket id: {socket_id}')
         username = request.args.get('username')
         user_id = request.args.get('userId')
-        chat_user_id = request.args.get('chatUserId')
+        chat_user_id = data['chatUserId']
         chat_key = combine_strings(user_id, chat_user_id)
-        print(f"User connected: {username}, User ID: {user_id}, Chat User ID: {chat_user_id}")
+        print(f"{username}发送消息 User ID: {user_id}, Chat User ID: {chat_user_id}")
         print(f"data: {data}")
         private_chat_history[chat_key].append(data)
         if chat_user_id in user_map:
@@ -53,5 +57,6 @@ def register_socketio_events(socketio):
         socket_id = request.sid
         username = request.args.get('username')
         user_id = request.args.get('userId')
-        del user_map[user_id]  # 下线后移除user id和对应的socket id
-        print(f"用户{username}断连, 用户id: {user_id}, 用户socket id: {socket_id}")
+        if user_id in user_map:
+            del user_map[user_id]  # 下线后移除user id和对应的socket id
+        print(f"用户断连 socket id: {socket_id} username: {username} user_id: {user_id}")
