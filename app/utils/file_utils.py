@@ -12,6 +12,12 @@ def get_uuid_filename(filename):
 
 
 def image_upload_oss(file, filename):
+    file_size = os.fstat(file.stream.fileno()).st_size
+    print(f'file_size:{file_size / 1024}KB')
+    # 上传的文件大小不得超过10MB
+    if file_size / (1024 * 1024) > 10:
+        return 500, ''
+
     endpoint = 'https://oss-cn-hangzhou.aliyuncs.com'
 
     auth = oss2.Auth(
