@@ -1,16 +1,13 @@
-import os
-
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app.status import StatusCode
-from config import WEB_BASE_URL
 from ..database import db
 from ..models.phones import Phones
 from ..models.user_follows import UserFollows
 from ..models.users import Users
 from ..utils import file_utils
-from ..utils.file_utils import dev_file_upload
+from ..utils.file_utils import image_upload_oss
 
 userinfo_bp = Blueprint('userinfo', __name__)
 
@@ -55,18 +52,25 @@ def upload_user_avatar():
     user_id = get_jwt_identity()
     pic = request.files['pic']
     new_filename = file_utils.get_uuid_filename(pic.filename)
-    if os.environ.get('FLASK_ENV') == 'development':
-        dev_file_upload(pic, new_filename, request.headers.get('Authorization'))
-    else:
-        pic.save(fr'/www/wwwroot/within-circle/images/{new_filename}')  # r表示忽略所有的转义字符
-    user_exist = Users.query.filter_by(id=user_id).first()
-    user_exist.avatar_url = f'{WEB_BASE_URL}/images/{new_filename}'
-    db.session.commit()
-    res_data = {
-        'code': StatusCode.OK,
-        'msg': '修改成功'
-    }
-    return jsonify(res_data)
+    try:
+        code, url = image_upload_oss(pic, new_filename)
+        if code != 200:
+            raise Exception('文件上传失败')
+        user_exist = Users.query.filter_by(id=user_id).first()
+        user_exist.avatar_url = url
+        db.session.commit()
+        res_data = {
+            'code': StatusCode.OK,
+            'msg': '修改成功'
+        }
+        return jsonify(res_data)
+    except Exception as e:
+        print('upload_user_avatar', e)
+        res_data = {
+            'code': StatusCode.ERROR,
+            'msg': '修改失败'
+        }
+        return jsonify(res_data)
 
 
 @userinfo_bp.route('/poster_user_info/<poster_id>', methods=['GET'])

@@ -1,10 +1,7 @@
 import os
 import uuid
 
-import requests
-
-from app.utils.os_utils import dir_pre_check
-from config import API_BASE_URL
+import oss2
 
 
 def get_uuid_filename(filename):
@@ -14,17 +11,25 @@ def get_uuid_filename(filename):
     return new_file_name
 
 
-def dev_file_upload(file, filename, authorization):
-    local_dir_path = r'C:\ProgramData\within-circle-file'
-    dir_pre_check(local_dir_path)
-    local_file_path = fr'{local_dir_path}\{filename}'
-    file.save(local_file_path)
-    headers = {
-        'Authorization': authorization
-    }
-    response = requests.post(f'{API_BASE_URL}/file-upload', headers=headers, data={
-        'filename': filename
-    }, files={
-        'pic': open(local_file_path, 'rb')
-    })
-    print(response.json())
+def image_upload_oss(file, filename):
+    endpoint = 'https://oss-cn-hangzhou.aliyuncs.com'
+
+    auth = oss2.Auth(
+        os.environ.get('ALIBABA_CLOUD_ACCESS_KEY_ID'),
+        os.environ.get('ALIBABA_CLOUD_ACCESS_KEY_SECRET')
+    )
+    bucket_name = 'withincircle'
+    bucket = oss2.Bucket(auth, endpoint, bucket_name)
+
+    dir_name = 'images'
+    key = f'{dir_name}/{filename}'
+
+    # 上传
+    result = bucket.put_object(key, file)
+    # 请求ID。请求ID是本次请求的唯一标识，强烈建议在程序日志中添加此参数。
+    print('request_id: {0}'.format(result.request_id))
+    # ETag是put_object方法返回值特有的属性，用于标识一个Object的内容。
+    print('ETag: {0}'.format(result.etag))
+    file_url = f'https://{bucket_name}.oss-cn-hangzhou.aliyuncs.com/{key}'
+
+    return result.status, file_url

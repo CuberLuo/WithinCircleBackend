@@ -1,18 +1,15 @@
-import os
-
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy import desc
 
 from app.models.posts import Posts
 from app.status import StatusCode
-from config import WEB_BASE_URL
 from ..database import db
 from ..models.post_likes import PostLikes
 from ..models.post_pics import PostPics
 from ..models.users import Users
 from ..utils import file_utils
-from ..utils.file_utils import dev_file_upload
+from ..utils.file_utils import image_upload_oss
 
 post_bp = Blueprint('post', __name__)
 
@@ -62,17 +59,19 @@ def process_posts(all_posts, user_id):
 @post_bp.route('/file-upload', methods=['POST'])
 @jwt_required(optional=False)
 def file_upload():
-    try:
-        pic = request.files['pic']
-        filename = request.form.get('filename')
-        pic.save(fr'/www/wwwroot/within-circle/images/{filename}')
+    pic = request.files['pic']
+    new_filename = file_utils.get_uuid_filename(pic.filename)
+    code, url = image_upload_oss(pic, new_filename)
+    if code == 200:
         res_data = {
             'code': StatusCode.OK,
-            'msg': '文件上传成功'
+            'msg': '文件上传成功',
+            'data': {
+                'url': url
+            }
         }
         return jsonify(res_data)
-    except Exception as e:
-        print('file_upload', e)
+    else:
         res_data = {
             'code': StatusCode.ERROR,
             'msg': '文件上传失败'
@@ -98,11 +97,10 @@ def upload_post():
         db.session.commit()
         for pic in pic_list:
             new_filename = file_utils.get_uuid_filename(pic.filename)
-            if os.environ.get('FLASK_ENV') == 'development':
-                dev_file_upload(pic, new_filename, request.headers.get('Authorization'))
-            else:
-                pic.save(fr'/www/wwwroot/within-circle/images/{new_filename}')  # r表示忽略所有的转义字符
-            new_post_pics = PostPics(post_id, f'{WEB_BASE_URL}/images/{new_filename}')
+            code, url = image_upload_oss(pic, new_filename)
+            if code != 200:
+                raise Exception('文件上传失败')
+            new_post_pics = PostPics(post_id, url)
             db.session.add(new_post_pics)
             db.session.commit()
         res_data = {
